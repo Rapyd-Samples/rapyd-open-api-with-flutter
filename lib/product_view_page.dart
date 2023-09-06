@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'payment_page.dart'; // Import the payment success/failure page
 import 'product.dart'; // Import the Product class
+import 'rapyd_utilities.dart'; // Import the Rapyd Utilities
 
 class ProductViewPage extends StatelessWidget {
   final Product product;
@@ -37,16 +38,12 @@ class ProductViewPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
 
-                // Simulate payment success
-                bool paymentSuccess = true;
+                makeRequest("GET", "v1/data/countries", "").then((data)=>{
+                  print(data)
+                });
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PaymentPage(status: paymentSuccess ? PaymentStatus.success : PaymentStatus.failure,)),
-                );
-                
               },
               child: Text('Checkout'),
             ),
