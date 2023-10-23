@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'product.dart'; // Import the Product class
 import 'product_view_page.dart'; // Import the product view page
+import 'payment_page.dart';
+import 'checkout_view_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,8 +11,16 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
-      home: ProductsListingPage(),
+      initialRoute: '/', // Optional, sets the initial route
+      routes: {
+        '/': (context) => ProductsListingPage(),
+        '/product': (context) => ProductViewPage(),
+        '/checkout': (context) => CheckoutViewPage(),
+        '/success': (context) => PaymentPage(status: PaymentStatus.success), // Add this route
+        '/failed': (context) => PaymentPage(status: PaymentStatus.failure), // Add this route
+      },
     );
   }
 }
@@ -107,20 +117,19 @@ class ProductsListingPage extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.push(
+              Navigator.pushNamed(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => ProductViewPage(product: products[index]),
-                ),
+                '/product',
+                arguments: products[index],
               );
             },
             child: GridTile(
-              child: Image.asset(products[index].image, fit: BoxFit.cover),
               footer: GridTileBar(
                 backgroundColor: Colors.black45,
                 title: Text(products[index].name),
                 subtitle: Text('\$${products[index].price.toStringAsFixed(2)}'),
               ),
+              child: Image.asset(products[index].image, fit: BoxFit.cover),
             ),
           );
         },

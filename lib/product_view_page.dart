@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'payment_page.dart'; // Import the payment success/failure page
 import 'product.dart'; // Import the Product class
-import 'rapyd_utilities.dart'; // Import the Rapyd Utilities
 
 class ProductViewPage extends StatelessWidget {
-  final Product product;
-
-  ProductViewPage({required this.product});
 
   @override
   Widget build(BuildContext context) {
+    final Product product = ModalRoute.of(context)?.settings.arguments as Product;
     return Scaffold(
       appBar: AppBar(
         title: Text('Product View'),
@@ -40,9 +36,11 @@ class ProductViewPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
 
-                makeRequest("GET", "v1/data/countries", "").then((data)=>{
-                  print(data)
-                });
+                 Navigator.pushNamed(
+                  context,
+                  '/checkout',
+                  arguments: product,
+                );
 
               },
               child: Text('Checkout'),
