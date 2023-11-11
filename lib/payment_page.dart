@@ -42,6 +42,19 @@ class PaymentPage extends StatelessWidget {
               message,
               style: TextStyle(fontSize: 24),
             ),
+            SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/',
+                );
+              },
+              child: Text(
+                'Go Home',
+                style: TextStyle(fontSize: 20, color: Colors.blue),
+              ),
+            ),
           ],
         ),
       ),

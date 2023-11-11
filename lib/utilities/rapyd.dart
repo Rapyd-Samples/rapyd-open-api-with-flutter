@@ -2,46 +2,45 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:convert/convert.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:crypto/crypto.dart';
 
 class Rapyd {
-  // Declaring variables
-  final String _ACCESS_KEY = "{{YOUR_ACCESS_KEY}}";
-  final String _SECRET_KEY = "{{YOUR_SECRET_KEY}}";
-  final String _BASEURL = "https://sandboxapi.rapyd.net";
+  // Declaring global variables
+  final String ACCESS_KEY = "{{YOUR_ACCESS_KEY}}";
+  final String SECRET_KEY = "{{YOUR_ACCESS_KEY}}";
+  final String BASEURL = "https://sandboxapi.rapyd.net";
 
-  //Generating random string for each request with specific length as salt
-  String _getRandString(int len) {
-    var values = List<int>.generate(len, (i) => Random.secure().nextInt(256));
-    return base64Url.encode(values);
+  // Generating the salt for each request
+  String getSaltString(int len) {
+    var randomValues = List<int>.generate(len, (i) => Random.secure().nextInt(256));
+    return base64Url.encode(randomValues);
   }
 
-  //2. Generating Signature
-  String _getSignature(String httpMethod, String urlPath, String salt,
-      String timestamp, String bodyString) {
-    //concatenating string values together before hashing string according to Rapyd documentation
+  // Generating the Signature for each request
+  String getSignature(String httpMethod, String urlPath, String salt,
+      String timestamp, String dataBody) {
+    // string concatenation prior to string hashing
     String sigString = httpMethod +
         urlPath +
         salt +
         timestamp +
-        _ACCESS_KEY +
-        _SECRET_KEY +
-        bodyString;
+        ACCESS_KEY +
+        SECRET_KEY +
+        dataBody;
 
-    //passing the concatenated string through HMAC with the SHA256 algorithm
-    Hmac hmac = Hmac(sha256, utf8.encode(_SECRET_KEY));
+    // using the SHA256 method to run the concatenated string through HMAC
+    Hmac hmac = Hmac(sha256, utf8.encode(SECRET_KEY));
     Digest digest = hmac.convert(utf8.encode(sigString));
     var ss = hex.encode(digest.bytes);
 
-    //base64 encoding the results and returning it.
+    // encoding and returning the result
     return base64UrlEncode(ss.codeUnits);
   }
 
-  //3. Generating Headers
-  Map<String, String> _getHeaders(String urlEndpoint, {String body = ""}) {
+  // Generating the Headers for each request
+  Map<String, String> getHeaders(String urlEndpoint, {String body = ""}) {
     //generate a random string of length 16
-    String salt = _getRandString(16);
+    String salt = getSaltString(16);
 
     //calculating the unix timestamp in seconds
     String timestamp = (DateTime.now().toUtc().millisecondsSinceEpoch / 1000)
@@ -50,11 +49,11 @@ class Rapyd {
 
     //generating the signature for the request according to the docs
     String signature =
-        _getSignature("post", urlEndpoint, salt, timestamp, body);
+        getSignature("post", urlEndpoint, salt, timestamp, body);
 
     //Returning a map containing the headers and generated values
     return <String, String>{
-      "access_key": _ACCESS_KEY,
+      "access_key": ACCESS_KEY,
       "signature": signature,
       "salt": salt,
       "timestamp": timestamp,
@@ -62,23 +61,24 @@ class Rapyd {
     };
   }
 
-  Future<http.StreamedResponse> httpWithMethod(String method, String url, String bodyString, Map<String, String> headers) async {
+  //  helper function to make all HTTP request
+  Future<http.StreamedResponse> httpWithMethod(String method, String url, String dataBody, Map<String, String> headers) async {
     var request = http.Request(method, Uri.parse(url))
-    ..body = bodyString
+    ..body = dataBody
     ..headers.addAll(headers);
 
     // Add any additional body content here.
     return request.send();
   }
 
-  // 4. fuction to make all API request
+  // fuction to make all API request
   Future<Map> makeRequest(String method, String url, Object bodyData) async {
 
     try {
-      final responseURL = "$_BASEURL$url";
+      final responseURL = "$BASEURL$url";
       final String body = jsonEncode(bodyData);
 
-      var response = await httpWithMethod(method, responseURL, body,  _getHeaders(url, body: body));
+      var response = await httpWithMethod(method, responseURL, body,  getHeaders(url, body: body));
 
       var respStr = await response.stream.bytesToString();
 
