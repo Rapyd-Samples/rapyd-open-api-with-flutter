@@ -2,7 +2,7 @@
 
 Using Rapyd Open API in a Flutter application.
 
-## How to run a sample application
+## How to run the application
 - Log in to your Rapyd account
 - Make sure you are using the "sandbox" mode (switch in the bottom left part of the panel)
 - Go to the "Developers" tab. You will find your API keys there.
