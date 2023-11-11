@@ -1,6 +1,6 @@
 # Rapyd Open API with Flutter
 
-Using Rapyd open API in a FLutter application
+Using Rapyd Open API in a Flutter application.
 
 ## How to run a sample application
 - Log in to your Rapyd account
